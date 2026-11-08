@@ -4,9 +4,14 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from dotenv import load_dotenv
+from app.core.database import test_connection
 
 # Load environment variables from .env file
 load_dotenv()
+
+# Test database connection on startup
+print("Testing database connection...")
+test_connection()
 
 # Create the FastAPI application instance
 app = FastAPI(
@@ -16,7 +21,6 @@ app = FastAPI(
 )
 
 # CORS middleware - allows our React frontend to talk to this backend
-# Without this, the browser will block frontend requests to the backend
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["http://localhost:5173"],  # React dev server
