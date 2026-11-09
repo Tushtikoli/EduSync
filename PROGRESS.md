@@ -1,39 +1,46 @@
 # EduSync – Development Progress
 
 ## Current Phase
-Phase 2 – Database Design
+Phase 4 – Frontend Development
 
 ## Environment (Phase 0) ✅ COMPLETED
-- Git 2.56.0
-- Python 3.15.2
-- uv 0.13.7
-- Node.js v26.13.0
+- Git 2.56.0, Python 3.15.2, uv 0.13.7, Node.js v26.13.0
 - VS Code with extensions
-- GitHub connected: https://github.com/Tushtikoli/EduSync.git
+- GitHub: https://github.com/Tushtikoli/EduSync.git
 
 ## Phase 1 ✅ COMPLETED
-- [x] Created main project folders: backend, frontend, docs
-- [x] Created PROGRESS.md, README.md, .gitignore
-- [x] Initialized Python project with uv
-- [x] Installed FastAPI, uvicorn, python-dotenv, pydantic
-- [x] Created backend folder structure
-- [x] Created app/main.py with CORS and health check
-- [x] FastAPI server running on http://127.0.0.1:8000
-- [x] All endpoints tested and working
-- [x] Committed and pushed to GitHub
+- Project folders created: backend, frontend, docs
+- PROGRESS.md, README.md, .gitignore created
+- FastAPI server running on http://127.0.0.1:8000
+
+## Phase 2 ✅ COMPLETED
+- Neon PostgreSQL database created and connected
+- SQLAlchemy and Alembic configured
+- User model created
+- users table migrated to PostgreSQL
+
+## Phase 3 ✅ COMPLETED
+- passlib, bcrypt, python-jose, python-multipart installed
+- security.py - password hashing and JWT tokens
+- schemas/user.py - data validation
+- routes/auth.py - register and login endpoints
+- Registration tested and working
+- Login tested and working
+- JWT token generation working
 
 ## Files Created So Far
-- .gitignore
-- PROGRESS.md
-- README.md
 - backend/app/main.py
-- backend/pyproject.toml
-- backend/uv.lock
+- backend/app/core/database.py
+- backend/app/core/security.py
+- backend/app/models/user.py
+- backend/app/schemas/user.py
+- backend/app/routes/auth.py
+- backend/migrations/
 
 ## Next Step
-- Set up PostgreSQL database connection
-- Create database models
-- Set up Alembic migrations
+- Set up React frontend
+- Create login page
+- Connect frontend to backend
 
 ## Known Issues
 - None
