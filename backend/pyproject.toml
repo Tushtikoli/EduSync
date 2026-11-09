@@ -9,11 +9,16 @@ authors = [
 requires-python = ">=3.12"
 dependencies = [
     "alembic>=1.20.1",
+    "bcrypt==4.0.1",
+    "email-validator>=2.3.0",
     "fastapi>=0.162.2",
+    "passlib[bcrypt]>=1.7.4",
     "psycopg2-binary>=2.9.13",
     "psycopg[binary]>=3.3.8",
     "pydantic>=2.14.3",
     "python-dotenv>=1.2.4",
+    "python-jose[cryptography]>=3.5.0",
+    "python-multipart>=0.0.33",
     "sqlalchemy>=2.1.8",
     "uvicorn>=0.54.0",
 ]
