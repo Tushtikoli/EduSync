@@ -1,4 +1,6 @@
+import { useState, useEffect } from 'react'
 import DashboardLayout from '../../layouts/DashboardLayout'
+import api from '../../services/api'
 
 export default function StudentDashboard() {
   const name = localStorage.getItem('full_name') || 'Student'
@@ -8,11 +10,19 @@ export default function StudentDashboard() {
     month: 'long',
     day: 'numeric'
   })
+  const [announcements, setAnnouncements] = useState([])
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    api.get('/announcements/')
+      .then(res => setAnnouncements(res.data))
+      .catch(err => console.error(err))
+      .finally(() => setLoading(false))
+  }, [])
 
   return (
     <DashboardLayout role="student">
       <div style={{maxWidth: '1200px', margin: '0 auto'}}>
-
         <div style={{marginBottom: '2rem'}}>
           <h1 style={{
             fontSize: '1.75rem',
@@ -45,9 +55,8 @@ export default function StudentDashboard() {
           gap: '1.5rem'
         }}>
           <TodayTimetable />
-          <RecentAnnouncements />
+          <RecentAnnouncements announcements={announcements} loading={loading} />
         </div>
-
       </div>
     </DashboardLayout>
   )
@@ -60,7 +69,6 @@ function StatCard({ label, value, status }) {
     danger: 'var(--color-danger)',
     success: 'var(--color-success)',
   }
-
   return (
     <div style={{
       background: 'var(--color-surface)',
@@ -96,7 +104,6 @@ function TodayTimetable() {
     { time: '1:00 PM', subject: 'Database Management', teacher: 'Prof. Joshi', room: 'Room 205' },
     { time: '3:00 PM', subject: 'Software Engineering', teacher: 'Prof. Khan', room: 'Room 102' },
   ]
-
   return (
     <div style={{
       background: 'var(--color-surface)',
@@ -132,17 +139,10 @@ function TodayTimetable() {
               {c.time}
             </span>
             <div>
-              <p style={{
-                fontWeight: '500',
-                fontSize: '0.875rem',
-                color: 'var(--color-text-primary)'
-              }}>
+              <p style={{fontWeight: '500', fontSize: '0.875rem', color: 'var(--color-text-primary)'}}>
                 {c.subject}
               </p>
-              <p style={{
-                fontSize: '0.75rem',
-                color: 'var(--color-text-secondary)'
-              }}>
+              <p style={{fontSize: '0.75rem', color: 'var(--color-text-secondary)'}}>
                 {c.teacher} · {c.room}
               </p>
             </div>
@@ -153,19 +153,31 @@ function TodayTimetable() {
   )
 }
 
-function RecentAnnouncements() {
-  const announcements = [
-    { title: 'Internal Exam Schedule Released', time: '2 hours ago', tag: 'Exam' },
-    { title: 'Holiday on 15th November', time: '1 day ago', tag: 'Holiday' },
-    { title: 'Assignment submission deadline extended', time: '2 days ago', tag: 'Assignment' },
-    { title: 'Workshop on AI — Register Now', time: '3 days ago', tag: 'Event' },
-  ]
-
+function RecentAnnouncements({ announcements, loading }) {
   const tagColors = {
     Exam: '#dc2626',
     Holiday: '#16a34a',
     Assignment: '#d97706',
     Event: '#2563eb',
+    General: '#6b7280',
+  }
+
+  if (loading) {
+    return (
+      <div style={{
+        background: 'var(--color-surface)',
+        borderRadius: 'var(--radius-md)',
+        padding: '1.5rem',
+        boxShadow: 'var(--shadow-sm)',
+        border: '1px solid var(--color-border)',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        minHeight: '200px'
+      }}>
+        <p style={{color: 'var(--color-text-muted)'}}>Loading announcements...</p>
+      </div>
+    )
   }
 
   return (
@@ -185,12 +197,12 @@ function RecentAnnouncements() {
         Announcements
       </h2>
       <div style={{display: 'flex', flexDirection: 'column', gap: '0.75rem'}}>
-        {announcements.map((a, i) => (
-          <div key={i} style={{
+        {announcements.map((a) => (
+          <div key={a.id} style={{
             padding: '0.75rem',
             borderRadius: 'var(--radius-sm)',
             background: 'var(--color-bg)',
-            borderLeft: `3px solid ${tagColors[a.tag]}`,
+            borderLeft: `3px solid ${tagColors[a.tag] || '#6b7280'}`,
           }}>
             <div style={{
               display: 'flex',
@@ -198,31 +210,23 @@ function RecentAnnouncements() {
               alignItems: 'flex-start',
               gap: '0.5rem'
             }}>
-              <p style={{
-                fontSize: '0.875rem',
-                fontWeight: '500',
-                color: 'var(--color-text-primary)'
-              }}>
+              <p style={{fontWeight: '500', fontSize: '0.875rem', color: 'var(--color-text-primary)'}}>
                 {a.title}
               </p>
               <span style={{
                 fontSize: '0.7rem',
                 padding: '0.2rem 0.5rem',
                 borderRadius: '999px',
-                background: tagColors[a.tag] + '20',
-                color: tagColors[a.tag],
+                background: (tagColors[a.tag] || '#6b7280') + '20',
+                color: tagColors[a.tag] || '#6b7280',
                 fontWeight: '500',
                 whiteSpace: 'nowrap'
               }}>
                 {a.tag}
               </span>
             </div>
-            <p style={{
-              fontSize: '0.75rem',
-              color: 'var(--color-text-muted)',
-              marginTop: '0.25rem'
-            }}>
-              {a.time}
+            <p style={{fontSize: '0.75rem', color: 'var(--color-text-muted)', marginTop: '0.25rem'}}>
+              {a.content}
             </p>
           </div>
         ))}

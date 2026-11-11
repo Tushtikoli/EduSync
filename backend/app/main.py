@@ -1,9 +1,9 @@
-# EduSync Backend - Main Application Entry Point
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from dotenv import load_dotenv
 from app.core.database import test_connection
 from app.routes import auth
+from app.routes import announcements
 
 load_dotenv()
 
@@ -24,8 +24,8 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Register routers
 app.include_router(auth.router)
+app.include_router(announcements.router)
 
 @app.get("/")
 def root():
