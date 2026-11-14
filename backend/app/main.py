@@ -4,6 +4,7 @@ from dotenv import load_dotenv
 from app.core.database import test_connection
 from app.routes import auth
 from app.routes import announcements
+from app.routes import timetable
 
 load_dotenv()
 
@@ -26,6 +27,7 @@ app.add_middleware(
 
 app.include_router(auth.router)
 app.include_router(announcements.router)
+app.include_router(timetable.router)
 
 @app.get("/")
 def root():

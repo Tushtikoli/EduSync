@@ -15,7 +15,7 @@ DATABASE_URL = os.getenv("DATABASE_URL")
 
 # Create the database engine
 # This is the actual connection to PostgreSQL
-engine = create_engine(DATABASE_URL)
+engine = create_engine(DATABASE_URL.replace("postgresql+psycopg://", "postgresql+psycopg2://").replace("postgresql://", "postgresql+psycopg2://"))
 
 # SessionLocal is used to create database sessions
 # A session is like opening and closing a connection to the database
