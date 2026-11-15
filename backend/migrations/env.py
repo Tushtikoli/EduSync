@@ -22,6 +22,8 @@ from app.models.user import User
 from app.models.announcement import Announcement
 from app.models.timetable import TimetableSlot
 from app.models.attendance import AttendanceRecord
+from app.models.assignment import Assignment, Submission
+from app.models.study_material import StudyMaterial
 from app.core.database import Base
 target_metadata = Base.metadata
 

@@ -17,6 +17,7 @@ export default function StudentDashboard() {
   })
   const [announcements, setAnnouncements] = useState([])
   const [classes, setClasses] = useState([])
+  const [assignments, setAssignments] = useState([])
   const [loading, setLoading] = useState(true)
   const [timetableLoading, setTimetableLoading] = useState(true)
 
@@ -30,6 +31,10 @@ export default function StudentDashboard() {
       .then(res => setClasses(res.data))
       .catch(err => console.error(err))
       .finally(() => setTimetableLoading(false))
+
+    api.get('/assignments/?department=BSc IT&semester=5')
+      .then(res => setAssignments(res.data))
+      .catch(err => console.error(err))
   }, [])
 
   return (
@@ -73,7 +78,7 @@ export default function StudentDashboard() {
           }}>
             {[
               { label: 'Classes Today', value: timetableLoading ? '...' : `${classes.length}`, emoji: '📚' },
-              { label: 'Assignments Due', value: '3', emoji: '📝' },
+              { label: 'Assignments Due', value: `${assignments.length}`, emoji: '📝' },
               { label: 'Attendance', value: '78%', emoji: '📊' },
             ].map((item, i) => (
               <div key={i} style={{
@@ -104,7 +109,7 @@ export default function StudentDashboard() {
         }}>
           {[
             { label: 'Overall Attendance', value: '78%', sub: 'Need 75% minimum', color: '#f59e0b', bg: 'linear-gradient(135deg, #fef3c7, #fde68a)', icon: '📈' },
-            { label: 'Pending Assignments', value: '3', sub: 'Due this week', color: '#ef4444', bg: 'linear-gradient(135deg, #fee2e2, #fecaca)', icon: '📋' },
+            { label: 'Pending Assignments', value: `${assignments.length}`, sub: 'Due this week', color: '#ef4444', bg: 'linear-gradient(135deg, #fee2e2, #fecaca)', icon: '📋' },
             { label: 'Subjects', value: '6', sub: 'This semester', color: '#8b5cf6', bg: 'linear-gradient(135deg, #ede9fe, #ddd6fe)', icon: '📖' },
             { label: 'Study Streak', value: '5 days', sub: 'Keep it up!', color: '#10b981', bg: 'linear-gradient(135deg, #d1fae5, #a7f3d0)', icon: '🔥' },
           ].map((card, i) => (
@@ -132,7 +137,10 @@ export default function StudentDashboard() {
           <AttendanceCard />
         </div>
 
-        <RecentAnnouncements announcements={announcements} loading={loading} />
+        <div style={{display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem', marginBottom: '1.5rem'}}>
+          <AssignmentsList assignments={assignments} />
+          <RecentAnnouncements announcements={announcements} loading={loading} />
+        </div>
 
       </div>
     </DashboardLayout>
@@ -258,6 +266,67 @@ function AttendanceCard() {
   )
 }
 
+function AssignmentsList({ assignments }) {
+  const getDaysLeft = (deadline) => {
+    const diff = new Date(deadline) - new Date()
+    const days = Math.ceil(diff / (1000 * 60 * 60 * 24))
+    return days
+  }
+
+  return (
+    <div style={{
+      background: 'white', borderRadius: '20px', padding: '1.5rem',
+      boxShadow: '0 2px 12px rgba(0,0,0,0.06)', border: '1px solid #f1f5f9',
+    }}>
+      <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem'}}>
+        <h2 style={{fontSize: '1rem', fontWeight: '700', color: '#1e293b'}}>
+          Pending Assignments 📋
+        </h2>
+        <span style={{
+          fontSize: '0.75rem', background: '#fee2e2', color: '#dc2626',
+          padding: '0.25rem 0.75rem', borderRadius: '999px', fontWeight: '600'
+        }}>
+          {assignments.length} due
+        </span>
+      </div>
+      {assignments.length === 0 ? (
+        <div style={{textAlign: 'center', padding: '2rem'}}>
+          <p style={{fontSize: '2rem'}}>✅</p>
+          <p style={{color: '#94a3b8', marginTop: '0.5rem'}}>All caught up!</p>
+        </div>
+      ) : (
+        <div style={{display: 'flex', flexDirection: 'column', gap: '0.75rem'}}>
+          {assignments.map((a) => {
+            const daysLeft = getDaysLeft(a.deadline)
+            const urgentColor = daysLeft <= 2 ? '#ef4444' : daysLeft <= 5 ? '#f59e0b' : '#10b981'
+            return (
+              <div key={a.id} style={{
+                padding: '0.875rem', borderRadius: '12px', background: '#f8fafc',
+                borderLeft: `4px solid ${urgentColor}`,
+              }}>
+                <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start'}}>
+                  <div style={{flex: 1}}>
+                    <p style={{fontWeight: '600', fontSize: '0.875rem', color: '#1e293b'}}>{a.title}</p>
+                    <p style={{fontSize: '0.75rem', color: '#94a3b8', marginTop: '0.1rem'}}>{a.subject} · {a.teacher_name}</p>
+                  </div>
+                  <span style={{
+                    fontSize: '0.7rem', fontWeight: '700',
+                    color: urgentColor, background: urgentColor + '15',
+                    padding: '0.2rem 0.5rem', borderRadius: '999px',
+                    whiteSpace: 'nowrap', marginLeft: '0.5rem'
+                  }}>
+                    {daysLeft <= 0 ? 'Overdue!' : `${daysLeft}d left`}
+                  </span>
+                </div>
+              </div>
+            )
+          })}
+        </div>
+      )}
+    </div>
+  )
+}
+
 function RecentAnnouncements({ announcements, loading }) {
   const tagColors = {
     Exam: { bg: '#fee2e2', color: '#dc2626', emoji: '📝' },
@@ -278,7 +347,7 @@ function RecentAnnouncements({ announcements, loading }) {
       {loading ? (
         <p style={{color: '#94a3b8', textAlign: 'center', padding: '2rem'}}>Loading...</p>
       ) : (
-        <div style={{display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '0.75rem'}}>
+        <div style={{display: 'flex', flexDirection: 'column', gap: '0.75rem'}}>
           {announcements.map((a) => {
             const style = tagColors[a.tag] || tagColors.General
             return (
@@ -289,19 +358,13 @@ function RecentAnnouncements({ announcements, loading }) {
               onMouseEnter={e => e.currentTarget.style.transform = 'translateY(-2px)'}
               onMouseLeave={e => e.currentTarget.style.transform = 'translateY(0)'}
               >
-                <div style={{fontSize: '1.5rem', marginBottom: '0.5rem'}}>{style.emoji}</div>
-                <p style={{fontWeight: '600', fontSize: '0.875rem', color: '#1e293b', marginBottom: '0.25rem'}}>
-                  {a.title}
-                </p>
+                <div style={{display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.25rem'}}>
+                  <span style={{fontSize: '1rem'}}>{style.emoji}</span>
+                  <p style={{fontWeight: '600', fontSize: '0.875rem', color: '#1e293b'}}>
+                    {a.title}
+                  </p>
+                </div>
                 <p style={{fontSize: '0.75rem', color: '#64748b'}}>{a.content}</p>
-                <span style={{
-                  display: 'inline-block', marginTop: '0.5rem',
-                  fontSize: '0.7rem', fontWeight: '700',
-                  color: style.color, background: 'rgba(255,255,255,0.6)',
-                  padding: '0.2rem 0.5rem', borderRadius: '999px',
-                }}>
-                  {a.tag}
-                </span>
               </div>
             )
           })}

@@ -5,6 +5,7 @@ from app.core.database import test_connection
 from app.routes import auth
 from app.routes import announcements
 from app.routes import timetable
+from app.routes import assignments
 
 load_dotenv()
 
@@ -28,6 +29,7 @@ app.add_middleware(
 app.include_router(auth.router)
 app.include_router(announcements.router)
 app.include_router(timetable.router)
+app.include_router(assignments.router)
 
 @app.get("/")
 def root():
