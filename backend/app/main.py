@@ -6,6 +6,7 @@ from app.routes import auth
 from app.routes import announcements
 from app.routes import timetable
 from app.routes import assignments
+from app.routes import ai_tutor
 
 load_dotenv()
 
@@ -30,14 +31,11 @@ app.include_router(auth.router)
 app.include_router(announcements.router)
 app.include_router(timetable.router)
 app.include_router(assignments.router)
+app.include_router(ai_tutor.router)
 
 @app.get("/")
 def root():
-    return {
-        "message": "Welcome to EduSync API",
-        "status": "running",
-        "version": "1.0.0"
-    }
+    return {"message": "Welcome to EduSync API", "status": "running", "version": "1.0.0"}
 
 @app.get("/health")
 def health_check():
